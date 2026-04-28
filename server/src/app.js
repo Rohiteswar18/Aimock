@@ -29,29 +29,33 @@ const app = express();
 // import cors from 'cors';
 
 // CORS configuration
+// import cors from "cors";
+
 const allowedOrigins = [
   "https://aimock-beta.vercel.app",
   "https://aimock.vercel.app"
 ];
 
-app.use(cors({
+const corsOptions = {
   origin: function (origin, callback) {
-    // allow requests with no origin (like Postman)
-    if (!origin) return callback(null, true);
+    if (!origin) return callback(null, true); // Postman / curl
 
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     } else {
-      return callback(new Error("CORS not allowed"));
+      return callback(new Error("CORS not allowed: " + origin));
     }
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
-}));
+};
 
-// Handle preflight requests
-app.options('*', cors());
+// Apply CORS
+app.use(cors(corsOptions));
+
+// Handle preflight with SAME options
+app.options("*", cors(corsOptions));
 
 // 2. Body Parser: Convert incoming JSON requests to JavaScript objects
 //    10mb limit to handle large resume text and interview data
