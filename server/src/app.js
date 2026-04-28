@@ -26,14 +26,32 @@ const app = express();
 
 // 1. CORS: Allow our frontend (React) to talk to this backend
 //    Without this, browsers will block requests from localhost:5173 → localhost:5000
+// import cors from 'cors';
+
+// CORS configuration
+const allowedOrigins = [
+  "https://aimock-beta.vercel.app",
+  "https://aimock.vercel.app"
+];
+
 app.use(cors({
-  origin: [
-    "https://aimock-beta.vercel.app",   // your current frontend
-    "https://aimock.vercel.app"         // future production URL
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: function (origin, callback) {
+    // allow requests with no origin (like Postman)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error("CORS not allowed"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
+
+// Handle preflight requests
+app.options('*', cors());
 
 // 2. Body Parser: Convert incoming JSON requests to JavaScript objects
 //    10mb limit to handle large resume text and interview data
