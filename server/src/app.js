@@ -38,23 +38,18 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // Postman / curl
+    if (!origin) return callback(null, true);
 
     if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
+      callback(null, true);
     } else {
-      return callback(new Error("CORS not allowed: " + origin));
+      callback(new Error("CORS not allowed: " + origin));
     }
   },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 };
 
-// Apply CORS
 app.use(cors(corsOptions));
-
-// Handle preflight with SAME options
 app.options("*", cors(corsOptions));
 
 // 2. Body Parser: Convert incoming JSON requests to JavaScript objects
